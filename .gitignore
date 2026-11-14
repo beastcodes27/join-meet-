@@ -5,3 +5,15 @@ dist/
 !.env.example
 test-results/
 playwright-report/
+
+# Credentials and local configuration
+.env.*
+!.env.example
+*.key
+*.pem
+*service-account*.json
+*service_account*.json
+*firebase-adminsdk*.json
+credentials*.json
+secrets/
+.aws/
