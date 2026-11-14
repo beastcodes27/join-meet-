@@ -1,0 +1,40 @@
+{
+  "name": "join-meeting",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "test:smoke": "playwright test"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.2",
+    "@tanstack/react-query": "^5.90.0",
+    "axios": "^1.13.2",
+    "firebase": "^12.6.0",
+    "lucide-react": "^0.562.0",
+    "livekit-client": "^2.15.0",
+    "@livekit/components-react": "^2.9.0",
+    "@livekit/components-styles": "^1.1.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "@vitejs/plugin-react": "^5.1.1",
+    "tailwindcss": "^3.4.19",
+    "postcss": "^8.5.6",
+    "autoprefixer": "^10.4.23",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.39.2",
+    "typescript-eslint": "^8.50.0",
+    "@eslint/js": "^9.39.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^16.5.0",
+    "@playwright/test": "^1.59.1"
+  }
+}
