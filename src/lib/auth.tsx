@@ -22,8 +22,9 @@ export function AuthProvider({ children }: {
     useEffect(() => {
         const interceptor = api.interceptors.response.use(response => response, error => {
             if (error.response?.status === 401) {
+                const previous = client.getQueryData<User | null>(['session']);
                 client.setQueryData(['session'], null);
-                client.removeQueries({ predicate: query => query.queryKey[0] !== 'session' });
+                if (previous) client.removeQueries({ predicate: query => query.queryKey[0] !== 'session' });
             }
             return Promise.reject(error);
         });
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: {
             }).response?.status !== 401)
                 throw error;
         }
-        client.clear();
+        client.removeQueries({ predicate: query => query.queryKey[0] !== 'session' });
         client.setQueryData(['session'], null);
     }
     return <AuthContext.Provider value={{ user: session.data ?? null, loading: session.isPending, login, logout }}>
