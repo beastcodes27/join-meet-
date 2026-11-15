@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { GridLayout, ParticipantTile, RoomAudioRenderer, StartAudio, TrackToggle, MediaDeviceMenu, useChat, useConnectionState, useParticipants, useRoomContext, useTracks } from '@livekit/components-react';
 import { ConnectionState, Track } from 'livekit-client';
 import { useQuery } from '@tanstack/react-query';
-import { Video, MonitorUp, Users, MessageSquare, Copy, Info, Phone, LockKeyhole, X, Send, Check, Ban, LogOut } from 'lucide-react';
+import { Video, MonitorUp, Users, MessageSquare, Copy, Info, Phone, LockKeyhole, X, Send, Check, Ban, LogOut, ShieldCheck } from 'lucide-react';
 import { api, csrf, errorMessage, type Admission, type Meeting, type Member } from '../lib/api';
 import { Modal, ErrorNotice, useToast } from './ui';
 export default function MeetingRoom({ meeting, code, error, onLeave }: {
