@@ -2378,3 +2378,45 @@ html {
 .chat-emojis button { width: 46px; height: 40px; font-size: 23px; border-radius: 7px; }
 .chat-emojis button:hover { background: #eff6ff; }
 @media (max-width: 800px) { .room-chat-panel { width: min(370px, 96vw); } }
+
+/* Scheduled meetings and personal reminders. */
+.dashboard-account { display: flex; align-items: center; gap: 20px; }
+.notification-button { position: relative; }
+.notification-button > span { position: absolute; top: -4px; right: -6px; min-width: 18px; border-radius: 10px; padding: 2px 4px; color: #fff; background: #2563eb; font-size: 12px; line-height: 14px; }
+.room-header .notification-button { color: #cbd5e1; }
+.notification-list { display: flex; flex-direction: column; gap: 9px; margin-top: 20px; max-height: 55dvh; overflow: auto; }
+.notification-entry { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; display: flex; gap: 6px; flex-direction: column; text-align: left; color: #334155; }
+.notification-entry.unread { background: #eff6ff; border-color: #bfdbfe; }
+.notification-entry strong { font-size: 16px; }
+.notification-entry span { font-size: 14px; }
+.notification-entry time { font-size: 13px; color: #475569; }
+.notification-entry small { color: #1d4ed8; font-size: 13px; margin-top: 5px; }
+.start-card .schedule-start { display: flex; align-items: center; gap: 7px; color: #fff; font-size: 14px; margin-top: 18px; position: relative; z-index: 1; }
+.upcoming-meetings { margin-bottom: 42px; }
+.upcoming-meetings > .section-heading { margin-bottom: 19px; }
+.schedule-empty { display: flex; gap: 17px; align-items: center; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 25px; background: #fff; color: #64748b; }
+.schedule-empty strong { font-size: 15px; color: #334155; }
+.schedule-empty p { font-size: 14px; margin-top: 5px; }
+.upcoming-row h3 { font-size: 15px; }
+.upcoming-row p { font-size: 13px; color: #475569; }
+.upcoming-row small { display: block; font-size: 12px; color: #64748b; margin-top: 4px; }
+.schedule-form select { width: 100%; background: #fff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 35px 12px 14px; margin-bottom: 15px; }
+.schedule-form .schedule-timezone { display: flex; align-items: center; gap: 6px; font-size: 13px; margin: -7px 0 20px; color: #475569; flex-wrap: wrap; }
+.schedule-form label { font-size: 14px; }
+.schedule-form input { font-size: 16px; }
+.schedule-summary, .scheduling-note { padding: 12px 14px; border-radius: 8px; background: #f1f5f9; color: #475569; font-size: 13px; line-height: 1.7; }
+.scheduling-note { margin: 15px 0; background: #fffbeb; color: #854d0e; }
+.booking-card { max-width: 640px; width: calc(100% - 36px); margin: 35px auto 65px; padding: 38px; background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; }
+.booking-card > .eyebrow { margin-top: 25px; }
+.booking-card > h1 { font-size: 33px; margin: 14px 0 10px; overflow-wrap: anywhere; }
+.booking-card > p { color: #64748b; font-size: 14px; }
+.booking-date { display: flex; flex-direction: column; gap: 9px; padding: 23px 0; margin: 22px 0 15px; border-block: 1px solid #e2e8f0; }
+.booking-date strong { font-size: 21px; color: #0f172a; }
+.booking-date span { font-size: 13px; color: #64748b; }
+.booking-card .booking-capacity { display: flex; gap: 8px; align-items: center; margin-bottom: 22px; }
+.booking-card .booking-help { margin-top: 25px; font-size: 13px; }
+.booking-confirmed { display: flex; gap: 12px; align-items: flex-start; border-radius: 10px; background: #ecfdf5; padding: 17px; color: #166534; }
+.booking-confirmed strong { font-size: 16px; }
+.booking-confirmed p { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-top: 7px; }
+.booking-card > .text-link { margin-top: 16px; }
+@media(max-width: 540px) { .booking-card { padding: 25px; margin-top: 22px; }.booking-card > h1 { font-size: 28px; }.booking-date strong { font-size: 18px; }.schedule-empty { padding: 20px; }.upcoming-row>div { min-width: 65%; }.upcoming-row>.button { margin-left: 0; }.upcoming-meetings .section-heading h2 { font-size: 17px; }.upcoming-meetings .section-heading { align-items: flex-start; }.upcoming-meetings .section-heading p { max-width: 190px; } }

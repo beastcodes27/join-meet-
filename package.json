@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test:smoke": "playwright test",
-    "test": "node --experimental-strip-types tests/meeting-code.test.ts && node --experimental-strip-types tests/chat.test.ts && node --experimental-strip-types tests/connection.test.ts",
+    "test": "node --experimental-strip-types tests/meeting-code.test.ts && node --experimental-strip-types tests/chat.test.ts && node --experimental-strip-types tests/connection.test.ts && node --experimental-strip-types tests/scheduling.test.ts",
     "test:call": "playwright test tests/call.spec.ts --project=chromium"
   },
   "dependencies": {

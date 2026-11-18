@@ -1,9 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Video, Plus, ArrowUpRight, Clock3, LogOut, LayoutDashboard, ShieldCheck, Copy, ArrowRight } from 'lucide-react';
+import { Video, Plus, ArrowUpRight, Clock3, LogOut, LayoutDashboard, ShieldCheck, Copy, ArrowRight, CalendarPlus } from 'lucide-react';
 import { Logo, PageLoading, ErrorNotice, Modal, Spinner, useToast } from '../components/ui';
 import { JoinForm } from '../components/JoinForm';
+import { ScheduleMeeting } from '../components/ScheduleMeeting';
+import { UpcomingMeetings } from '../components/UpcomingMeetings';
+import { NotificationBell } from '../components/NotificationBell';
 import { useAuth } from '../lib/auth';
 import { api, csrf, errorMessage, type Meeting } from '../lib/api';
 export default function Dashboard() {
@@ -11,6 +14,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const toast = useToast();
     const [create, setCreate] = useState(false);
+    const [schedule, setSchedule] = useState(false);
     const [title, setTitle] = useState('');
     const [error, setError] = useState('');
     const meetings = useQuery({ queryKey: ['meetings', user?.id], queryFn: async () => (await api.get<{
@@ -22,6 +26,7 @@ export default function Dashboard() {
                 meeting: Meeting;
             }>('/api/v1/meetings', { title: title.trim() || 'A new conversation' })).data.meeting;
         }, onSuccess: m => navigate(`/m/${m.meeting_code}`), onError: e => setError(errorMessage(e)) });
+    const recent = meetings.data?.filter(meeting => meeting.status !== 'scheduled');
     if (loading)
         return <PageLoading />;
     if (!user)
@@ -60,7 +65,7 @@ export default function Dashboard() {
         <div className="dashboard-body">
             <header className="dashboard-header">
                 <span>Workspace <span className="muted">/ Overview</span></span>
-                <details className="profile-menu">
+                <div className="dashboard-account"><NotificationBell/><details className="profile-menu">
                     <summary>
                         <span className="user-avatar">
                             {user.name.charAt(0)}
@@ -75,7 +80,7 @@ export default function Dashboard() {
                         </p>
                         <button onClick={signOut}><LogOut size={16}/> Sign out</button>
                     </div>
-                </details>
+                </details></div>
             </header>
             <main className="dashboard-content">
                 <div className="dashboard-welcome">
@@ -91,6 +96,7 @@ export default function Dashboard() {
                         <h2>Bring everyone together.</h2>
                         <p>A quick catch-up or a big idea. There’s a room for it.</p>
                         <button className="button white" onClick={() => { setCreate(true); setError(''); }}><Plus size={19}/> Start a meeting <ArrowRight size={17}/></button>
+                        <button className="schedule-start" onClick={() => setSchedule(true)}><CalendarPlus size={16}/> Schedule for later</button>
                         <span className="card-decoration"/>
                     </section>
                     <section className="join-card">
@@ -103,19 +109,20 @@ export default function Dashboard() {
                         <small><ShieldCheck size={14}/> Your host will welcome you in.</small>
                     </section>
                 </div>
+                <UpcomingMeetings onSchedule={() => setSchedule(true)}/>
                 <section className="recent-meetings">
                     <div className="section-heading">
                         <div>
                             <h2>Your recent meetings</h2>
                             <p>Pick up where you left off.</p>
                         </div>
-                        <span className="count-badge">{meetings.data?.length ?? 0} meetings</span>
+                        <span className="count-badge">{recent?.length ?? 0} meetings</span>
                     </div>
                     {meetings.isPending ? <div className="skeleton"/> : meetings.isError ? <ErrorNotice>
                         {errorMessage(meetings.error)} 
                         <button onClick={() => meetings.refetch()}>Try again</button>
-                    </ErrorNotice> : meetings.data?.length ? <div className="meeting-list">
-                        {meetings.data.map(m => <article className="meeting-row" key={m.uuid}>
+                    </ErrorNotice> : recent?.length ? <div className="meeting-list">
+                        {recent.map(m => <article className="meeting-row" key={m.uuid}>
                             <span className="meeting-row-icon">
                                 <Video />
                             </span>
@@ -145,7 +152,7 @@ export default function Dashboard() {
                         <button className="text-link" onClick={() => setCreate(true)}>Start your first meeting <ArrowRight size={16}/></button>
                     </div>}
                 </section>
-                <p className="dashboard-footnote">Instant meetings · Up to 12 people by default · Host-approved guests</p>
+                <p className="dashboard-footnote">Instant or scheduled meetings · One-hour booking reminders · Host-approved guests</p>
             </main>
             <nav className="mobile-nav">
                 <Link to="/">Home</Link>
@@ -153,6 +160,7 @@ export default function Dashboard() {
                 <button onClick={signOut}>Sign out</button>
             </nav>
         </div>
+        {schedule && <ScheduleMeeting onClose={() => setSchedule(false)}/>}
         {create && <Modal title="Make room for a conversation" onClose={() => setCreate(false)}>
             <form onSubmit={submit}>
                 <p>Give your meeting a name. You can share its link as soon as it’s created.</p>

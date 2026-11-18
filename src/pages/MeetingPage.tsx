@@ -7,6 +7,8 @@ import { Logo, PageLoading, ErrorNotice, Spinner } from '../components/ui';
 import { api, csrf, errorMessage, meetingQuery, type Admission, type Meeting } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import MeetingRoom from '../components/MeetingRoom';
+import { MeetingBooking } from '../components/MeetingBooking';
+import { NotificationBell } from '../components/NotificationBell';
 import { MeetingConnection } from '../components/MeetingConnection';
 import { type ConnectionIssue } from '../lib/connection';
 import '@livekit/components-styles';
@@ -74,6 +76,7 @@ export default function MeetingPage() {
     </main>;
     if (!meeting)
         return <PageLoading />;
+    if (meeting.scheduled_at && !meeting.can_join) return <main className="prejoin-page"><header className="nav wrap"><Logo/><NotificationBell/></header><MeetingBooking meeting={meeting}/></main>;
     if (issue) return <main className="meeting-exit">
         <Logo/><h1>{issue.message}</h1><p>Connection status: {issue.code.replaceAll('_', ' ').toLowerCase()}</p>
         {error && <ErrorNotice>{error}</ErrorNotice>}

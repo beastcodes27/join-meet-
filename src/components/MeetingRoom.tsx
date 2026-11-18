@@ -6,6 +6,7 @@ import { Video, MonitorUp, Users, MessageSquare, Copy, Info, Phone, LockKeyhole,
 import { api, csrf, errorMessage, type Admission, type Meeting, type Member } from '../lib/api';
 import { Modal, ErrorNotice, useToast } from './ui';
 import { MeetingChat } from './MeetingChat';
+import { NotificationBell } from './NotificationBell';
 import { useInCallChat } from '../hooks/useInCallChat';
 export default function MeetingRoom({ meeting, code, error, onLeave }: {
     meeting: Meeting;
@@ -91,6 +92,7 @@ export default function MeetingRoom({ meeting, code, error, onLeave }: {
                 </div>
             </div>
             <div>
+                <NotificationBell/>
                 <button className="room-button" onClick={copy}>
                     <Copy size={17}/>
                     <span>Copy invite</span>

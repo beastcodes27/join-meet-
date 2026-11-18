@@ -1,22 +1,25 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, Video } from 'lucide-react';
 import { Logo, Spinner, ErrorNotice } from '../components/ui';
 import { useAuth } from '../lib/auth';
 import { errorMessage } from '../lib/api';
+import { loginReturn } from '../lib/scheduling';
 export default function Login() {
     const { user, login } = useAuth();
     const navigate = useNavigate();
+    const [search] = useSearchParams();
+    const destination = loginReturn(search.get('returnTo'));
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     if (user)
-        return <Navigate to="/dashboard" replace/>;
+        return <Navigate to={destination} replace/>;
     async function signIn() {
         setBusy(true);
         setError('');
         try {
             await login();
-            navigate('/dashboard');
+            navigate(destination);
         }
         catch (e) {
             setError(errorMessage(e));

@@ -16,7 +16,7 @@ export type Meeting = {
     uuid: string;
     meeting_code: string;
     title: string;
-    status: 'created' | 'active' | 'ended';
+    status: 'created' | 'scheduled' | 'active' | 'ended';
     locked: boolean;
     max_participants: number;
     host: {
@@ -26,7 +26,17 @@ export type Meeting = {
     share_url: string;
     expires_at: string;
     created_at: string;
+    scheduled_at: string | null;
+    timezone: string;
+    duration_minutes: number;
+    booking_count: number;
+    is_booked: boolean;
+    can_join: boolean;
+    email_reminder_mode: 'preview' | 'delivery' | 'unavailable';
 };
+export type Reminder = { id: string; read_at: string | null; created_at: string; data: { title: string; body: string; meeting_code: string; scheduled_at: string; timezone: string } };
+export type NotificationResponse = { notifications: Reminder[]; unread_count: number; email_reminder_mode: Meeting['email_reminder_mode'] };
+export const notificationQuery = (userId?: number) => ({ queryKey: ['notifications', userId], queryFn: async () => (await api.get<NotificationResponse>('/api/v1/notifications')).data, enabled: !!userId, refetchInterval: 30000 });
 export type Admission = {
     id: number;
     participant_identifier: string;

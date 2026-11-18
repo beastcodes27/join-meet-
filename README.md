@@ -42,3 +42,11 @@ Chat uses the LiveKit SDK and stays in room memory. The chat button shows unread
 The room now uses a stable SDK instance with serialized connect/disconnect work. Temporary meeting-metadata failures keep the call mounted. Final disconnects show a reason (including duplicate-tab identities and media transport failures); recoverable cases offer a fresh, backend-authorized join. Removed participants and ended rooms never offer a reconnect bypass. One identity per signed-in account/guest session still applies: use a separate browser profile or private window for the guest when testing on one computer.
 
 Run `npm run test:call` for the optional real two-browser meeting/chat acceptance test. It requires `SMOKE_HOST_STORAGE_STATE` pointing to a local, untracked Playwright storage-state file for a signed-in test host and a running backend/LiveKit. The test creates its own private meeting. Keep storage-state files out of Git.
+
+## Scheduled meetings and reminders
+
+Use **Schedule for later** on the dashboard to choose a title, local date/time and duration. Times are sent to the API as UTC; the local timezone is displayed before submission. The host is automatically booked and can copy the invitation or cancel a future meeting. Signed-in invitees can book from the invitation page, cancel their own booking, and see their booked meetings on the dashboard. The room opens at the scheduled time and booking does not bypass host admission.
+
+The notification bell shows personal in-app reminders, which can be marked read by opening them. Booked users receive reminders one hour before the start; a booking made within the final hour queues one immediately. Keep the backend scheduler/worker running. Development emails are captured at **http://localhost:8027** by Mailpit; this does not send to external inboxes. Production email requires SMTP configuration in the backend. The UI distinguishes preview and unavailable delivery modes.
+
+`npm run test:smoke` includes an optional scheduled-meeting creation/booking/cancellation flow when `SMOKE_HOST_STORAGE_STATE` is set to a local test-host authentication state file. No mock backend replaces the real API in these browser specs. Node tests cover timezone conversion, invalid/DST local times and safe return-to-meeting login redirects.
