@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { GridLayout, ParticipantTile, RoomAudioRenderer, StartAudio, TrackToggle, MediaDeviceMenu, useChat, useConnectionState, useParticipants, useRoomContext, useTracks } from '@livekit/components-react';
+import { useRef, useState } from 'react';
+import { GridLayout, ParticipantTile, RoomAudioRenderer, StartAudio, TrackToggle, MediaDeviceMenu, useConnectionState, useParticipants, useRoomContext, useTracks } from '@livekit/components-react';
 import { ConnectionState, Track } from 'livekit-client';
 import { useQuery } from '@tanstack/react-query';
-import { Video, MonitorUp, Users, MessageSquare, Copy, Info, Phone, LockKeyhole, X, Send, Check, Ban, LogOut, ShieldCheck } from 'lucide-react';
+import { Video, MonitorUp, Users, MessageSquare, Copy, Info, Phone, LockKeyhole, X, Check, Ban, LogOut } from 'lucide-react';
 import { api, csrf, errorMessage, type Admission, type Meeting, type Member } from '../lib/api';
 import { Modal, ErrorNotice, useToast } from './ui';
+import { MeetingChat } from './MeetingChat';
+import { useInCallChat } from '../hooks/useInCallChat';
 export default function MeetingRoom({ meeting, code, error, onLeave }: {
     meeting: Meeting;
     code: string;
@@ -12,12 +14,13 @@ export default function MeetingRoom({ meeting, code, error, onLeave }: {
     onLeave: () => void;
 }) {
     const room = useRoomContext();
-    const chat = useChat();
     const state = useConnectionState();
     const participants = useParticipants();
     const toast = useToast();
     const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }, { source: Track.Source.ScreenShare, withPlaceholder: false }], { onlySubscribed: false });
     const [panel, setPanel] = useState<'people' | 'chat' | null>(null);
+    const chat = useInCallChat(panel === 'chat');
+    const chatButton = useRef<HTMLButtonElement>(null);
     const [info, setInfo] = useState(false);
     const [end, setEnd] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -112,12 +115,12 @@ export default function MeetingRoom({ meeting, code, error, onLeave }: {
                 <RoomAudioRenderer />
                 <StartAudio label="Enable meeting audio"/>
             </div>
-            {panel && <aside className="room-panel">
+            {panel && <aside className={`room-panel ${panel === 'chat' ? 'room-chat-panel' : ''}`} id="meeting-side-panel">
                 <div className="section-heading">
                     <h2>
                         {panel === 'people' ? 'People' : 'In-meeting chat'}
                     </h2>
-                    <button className="icon-button" aria-label="Close panel" onClick={() => setPanel(null)}>
+                    <button className="icon-button" aria-label="Close panel" onClick={() => { if (panel === 'chat') chatButton.current?.focus(); setPanel(null); }}>
                         <X size={20}/>
                     </button>
                 </div>
@@ -166,6 +169,7 @@ export default function MeetingRoom({ meeting, code, error, onLeave }: {
                 </div>}
             </aside>}
         </div>
+        <span className="sr-only" role="status" aria-live="polite">{chat.unread > 0 ? `${chat.unread} unread chat messages` : ''}</span>
         <footer className="room-toolbar">
             <div className="toolbar-meta">
                 <span>JOIN MEETING</span>
@@ -191,9 +195,10 @@ export default function MeetingRoom({ meeting, code, error, onLeave }: {
                     <Users size={20}/>
                     <span>People{pending ? ` (${pending})` : ''}</span>
                 </button>
-                <button className={`room-button ${panel === 'chat' ? 'selected' : ''}`} aria-pressed={panel === 'chat'} onClick={() => setPanel(panel === 'chat' ? null : 'chat')}>
+                <button ref={chatButton} className={`room-button chat-toggle ${panel === 'chat' ? 'selected' : ''}`} aria-label={`Chat${chat.unread ? `, ${chat.unread} unread messages` : ''}`} aria-pressed={panel === 'chat'} aria-expanded={panel === 'chat'} aria-controls="meeting-side-panel" onClick={() => setPanel(panel === 'chat' ? null : 'chat')}>
                     <MessageSquare size={20}/>
                     <span>Chat</span>
+                    {chat.unread > 0 && <span className="chat-unread" aria-hidden="true">{chat.unread > 99 ? '99+' : chat.unread}</span>}
                 </button>
             </div>
             <div className="leave-controls">
@@ -258,57 +263,3 @@ export default function MeetingRoom({ meeting, code, error, onLeave }: {
     </>;
 }
 function ArrowIcon() { return <MonitorUp size={15}/>; }
-function MeetingChat({ chat }: {
-    chat: ReturnType<typeof useChat>;
-}) {
-    const { chatMessages, send, isSending } = chat;
-    const state = useConnectionState();
-    const [text, setText] = useState('');
-    const [error, setError] = useState('');
-    const bottom = useRef<HTMLDivElement>(null);
-    useEffect(() => bottom.current?.scrollIntoView({ behavior: 'smooth' }), [chatMessages.length]);
-    async function submit(e: FormEvent) {
-        e.preventDefault();
-        if (!text.trim() || !send)
-            return;
-        setError('');
-        try {
-            await send(text.trim());
-            setText('');
-        }
-        catch {
-            setError('Message could not be sent. Check your connection, then try again.');
-        }
-    }
-    return <div className="chat-content">
-        <p className="chat-notice"><ShieldCheck size={16}/> Messages are live only. Chat history is not saved and may be lost when reconnecting.</p>
-        <div className="chat-messages" role="log" aria-live="polite">
-            {chatMessages.length === 0 && <p className="muted">Share a thought or a useful link.</p>}
-            {chatMessages.map((m, i) => <article className="chat-message" key={m.id ?? i}>
-                <div>
-                    <b>
-                        {m.from?.name || 'Participant'}
-                    </b>
-                    <time>
-                        {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </time>
-                </div>
-                <p>
-                    {m.message}
-                </p>
-            </article>)}
-            <div ref={bottom}/>
-        </div>
-        {error && <ErrorNotice>
-            {error}
-        </ErrorNotice>}
-        <form className="chat-form" onSubmit={submit}>
-            <label className="sr-only" htmlFor="chat-message">Message everyone</label>
-            <textarea id="chat-message" maxLength={2000} value={text} onChange={e => setText(e.target.value)} placeholder="Message everyone…" rows={2} disabled={state !== ConnectionState.Connected}/>
-            <button className="button small" type="submit" disabled={!text.trim() || isSending || state !== ConnectionState.Connected}>
-                <Send size={16}/>
-                {isSending ? 'Sending…' : 'Send'}
-            </button>
-        </form>
-    </div>;
-}

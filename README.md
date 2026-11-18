@@ -31,6 +31,14 @@ python3 scripts-check-secrets.py
 
 Browser smoke tests use the real running backend; they do not substitute mock APIs. To exercise guest admission, set `SMOKE_MEETING_URL` to a fresh meeting created by a real signed-in host. `SMOKE_BASE_URL` selects an existing staging site; otherwise Playwright starts Vite. Automated Google popup login and real cross-network media tests are not included; run the backend deployment guide's acceptance checklist with actual devices.
 
-In the restricted implementation environment, package-registry DNS access was unavailable. Full npm installation, lint, production build, and Playwright execution could not run. Three pure meeting-code tests and TypeScript syntax checks passed. Full SDK typing and browser behavior remain unverified. No complete npm lockfile could be generated: resolve dependencies, run all checks, audit, and commit a lockfile before deployment.
+The production build, lint, and Node tests run with the installed dependencies. Browser smoke tests still require a normal terminal with socket access and reachable Laravel/LiveKit services. See the backend verification report for the latest results and external-service limitations.
 
 Production uses `npm run build` and serves `dist/` through the backend repository's Nginx template. Use HTTPS, same-origin APIs, secure cookies, and a WSS/TURN deployment. See the backend's `docs/` directory for API, environment, architecture, SQLite backup, and VPS instructions, including the self-hosted LiveKit token-revocation limitation. Legal notices are private-beta drafts pending operator review.
+
+## In-call messaging and recovery
+
+Chat uses the LiveKit SDK and stays in room memory. The chat button shows unread remote messages while the panel or browser tab is hidden. Drafts and failed messages survive panel toggles. Enter sends, Shift+Enter inserts a newline, and IME composition is respected. Messages support timestamps, copy, quick emoji, safe HTTP(S) links, a 2,000-character limit, pending/sent/failed states and explicit retry. Retried streams retain a client ID to avoid duplicate display. “Sent” means accepted by the connection, not a recipient read receipt. Chat is not recorded or persisted; refreshing or leaving the room loses its history.
+
+The room now uses a stable SDK instance with serialized connect/disconnect work. Temporary meeting-metadata failures keep the call mounted. Final disconnects show a reason (including duplicate-tab identities and media transport failures); recoverable cases offer a fresh, backend-authorized join. Removed participants and ended rooms never offer a reconnect bypass. One identity per signed-in account/guest session still applies: use a separate browser profile or private window for the guest when testing on one computer.
+
+Run `npm run test:call` for the optional real two-browser meeting/chat acceptance test. It requires `SMOKE_HOST_STORAGE_STATE` pointing to a local, untracked Playwright storage-state file for a signed-in test host and a running backend/LiveKit. The test creates its own private meeting. Keep storage-state files out of Git.

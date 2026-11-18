@@ -1,13 +1,14 @@
 import { useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { LiveKitRoom, PreJoin, type LocalUserChoices } from '@livekit/components-react';
-import { DisconnectReason } from 'livekit-client';
+import { PreJoin, type LocalUserChoices } from '@livekit/components-react';
 import { ArrowLeft, ShieldCheck, Clock3 } from 'lucide-react';
 import { Logo, PageLoading, ErrorNotice, Spinner } from '../components/ui';
 import { api, csrf, errorMessage, meetingQuery, type Admission, type Meeting } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import MeetingRoom from '../components/MeetingRoom';
+import { MeetingConnection } from '../components/MeetingConnection';
+import { type ConnectionIssue } from '../lib/connection';
 import '@livekit/components-styles';
 type Connection = {
     token: string;
@@ -22,8 +23,11 @@ export default function MeetingPage() {
     const [connection, setConnection] = useState<Connection>();
     const [error, setError] = useState('');
     const [closed, setClosed] = useState('');
+    const [issue, setIssue] = useState<ConnectionIssue>();
+    const handleIssue = useCallback((value: ConnectionIssue) => setIssue(value), []);
+    const handleMediaError = useCallback((message: string) => setError(message), []);
     const metadata = useQuery({ ...meetingQuery(code), enabled: /^[a-f0-9]{32}$/.test(code), refetchInterval: 5000, retry: false });
-    const join = useMutation({ mutationFn: async (values: LocalUserChoices) => { await csrf(); return (await api.post<Connection>(`/api/v1/meetings/${code}/join`, { display_name: values.username.trim() })).data; }, onSuccess: data => { setConnection(data); setWaiting(false); setError(''); }, onError: e => { setWaiting(false); setError(errorMessage(e)); } });
+    const join = useMutation({ mutationFn: async (values: LocalUserChoices) => { await csrf(); return (await api.post<Connection>(`/api/v1/meetings/${code}/join`, { display_name: values.username.trim() })).data; }, onSuccess: data => { setConnection(data); setIssue(undefined); setWaiting(false); setError(''); }, onError: e => { setWaiting(false); setError(errorMessage(e)); } });
     const admission = useQuery({ queryKey: ['admission', code, choices?.username], queryFn: async () => (await api.post<{
             admission: Admission;
         }>(`/api/v1/meetings/${code}/admission-request`, { display_name: choices?.username.trim() })).data.admission, enabled: waiting, refetchInterval: query => query.state.data?.status === 'pending' ? 3000 : false, retry: false });
@@ -48,6 +52,7 @@ export default function MeetingPage() {
             setError(errorMessage(e));
         }
     }
+    const meeting = metadata.data ?? connection?.meeting;
     // Admission polling stops after approval; joining remains an explicit action to avoid duplicate token requests.
     if (endMessage)
         return <main className="meeting-exit">
@@ -58,7 +63,7 @@ export default function MeetingPage() {
         <p>Thanks for being part of the conversation.</p>
         <Link className="button" to={user ? '/dashboard' : '/'}>Return {user ? 'to dashboard' : 'home'}</Link>
     </main>;
-    if (!/^[a-f0-9]{32}$/.test(code) || metadata.isError)
+    if (!/^[a-f0-9]{32}$/.test(code) || (metadata.isError && !meeting))
         return <main className="meeting-exit">
         <Logo />
         <h1>We couldn’t open that meeting.</h1>
@@ -67,12 +72,17 @@ export default function MeetingPage() {
         </ErrorNotice>
         <Link to="/">Return home</Link>
     </main>;
-    if (!metadata.data)
+    if (!meeting)
         return <PageLoading />;
-    if (connection && choices)
-        return <LiveKitRoom token={connection.token} serverUrl={connection.server_url} connect audio={choices.audioEnabled ? { deviceId: choices.audioDeviceId } : false} video={choices.videoEnabled ? { deviceId: choices.videoDeviceId } : false} options={{ adaptiveStream: true, dynacast: true }} onError={e => setError(errorMessage(e))} onMediaDeviceFailure={() => setError('A media device is unavailable. Check permissions and select a working device.')} onDisconnected={reason => setClosed(reason === DisconnectReason.PARTICIPANT_REMOVED ? 'The host removed you from this meeting.' : reason === DisconnectReason.ROOM_DELETED ? 'The host has ended this meeting.' : 'Your connection closed. Check your network and ask the host to join again.')} data-lk-theme="default" className="meeting-shell">
-        <MeetingRoom meeting={metadata.data} code={code} error={error} onLeave={() => setClosed('You left the meeting.')}/>
-    </LiveKitRoom>;
+    if (issue) return <main className="meeting-exit">
+        <Logo/><h1>{issue.message}</h1><p>Connection status: {issue.code.replaceAll('_', ' ').toLowerCase()}</p>
+        {error && <ErrorNotice>{error}</ErrorNotice>}
+        {issue.retry && choices && <button className="button" disabled={join.isPending} onClick={() => join.mutate(choices)}>{join.isPending ? 'Reconnecting…' : 'Reconnect to meeting'}</button>}
+        <Link to={user ? '/dashboard' : '/'}>Return {user ? 'to dashboard' : 'home'}</Link>
+    </main>;
+    if (connection && choices) return <MeetingConnection token={connection.token} serverUrl={connection.server_url} choices={choices} onIssue={handleIssue} onMediaError={handleMediaError}>
+        <MeetingRoom meeting={meeting} code={code} error={metadata.isError ? 'Meeting details could not refresh. You can keep using the call.' : error} onLeave={() => setClosed('You left the meeting.')}/>
+    </MeetingConnection>;
     return <main className="prejoin-page">
         <header className="nav wrap">
             <Logo />
@@ -86,7 +96,7 @@ export default function MeetingPage() {
             </div>
             <div className="prejoin-card">
                 <div className="prejoin-preview" data-lk-theme="default">
-                    {!waiting && !join.isPending ? <PreJoin defaults={{ username: user?.name ?? '', audioEnabled: false, videoEnabled: false }} persistUserChoices={false} onSubmit={request} onError={mediaError} onValidate={values => !!values.username.trim() && values.username.trim().length <= 80} joinLabel={metadata.data.is_host ? 'Enter meeting' : 'Ask to join'} userLabel="Your display name"/> : <div className="waiting-state">
+                    {!waiting && !join.isPending ? <PreJoin defaults={{ username: user?.name ?? '', audioEnabled: false, videoEnabled: false }} persistUserChoices={false} onSubmit={request} onError={mediaError} onValidate={values => !!values.username.trim() && values.username.trim().length <= 80} joinLabel={meeting.is_host ? 'Enter meeting' : 'Ask to join'} userLabel="Your display name"/> : <div className="waiting-state">
                         <Clock3 size={44}/>
                         <h2>
                             {join.isPending ? 'Connecting you…' : admission.data?.status === 'approved' ? 'You’re welcome to join.' : admission.data?.status === 'rejected' ? 'Your request was declined.' : 'Your host will be with you soon.'}
@@ -108,20 +118,20 @@ export default function MeetingPage() {
                         <ShieldCheck />
                     </span>
                     <h2>
-                        {metadata.data.title}
+                        {meeting.title}
                     </h2>
                     <p>Hosted by <b>
-                            {metadata.data.host.name}
+                            {meeting.host.name}
                         </b></p>
                     <div className="prejoin-detail">
                         <span>Meeting access</span>
                         <b>
-                            {metadata.data.locked ? 'Locked by host' : 'Host approval required'}
+                            {meeting.locked ? 'Locked by host' : 'Host approval required'}
                         </b>
                     </div>
                     <div className="prejoin-detail">
                         <span>Room capacity</span>
-                        <b>{metadata.data.max_participants} people</b>
+                        <b>{meeting.max_participants} people</b>
                     </div>
                     <div className="prejoin-detail">
                         <span>Privacy</span>

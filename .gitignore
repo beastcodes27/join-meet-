@@ -18,3 +18,8 @@ credentials*.json
 secrets/
 .aws/
 *.tsbuildinfo
+
+# Browser authentication state is local only.
+.auth/
+playwright/.auth/
+*storage-state*.json
