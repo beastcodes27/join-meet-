@@ -2420,3 +2420,49 @@ html {
 .booking-confirmed p { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-top: 7px; }
 .booking-card > .text-link { margin-top: 16px; }
 @media(max-width: 540px) { .booking-card { padding: 25px; margin-top: 22px; }.booking-card > h1 { font-size: 28px; }.booking-date strong { font-size: 18px; }.schedule-empty { padding: 20px; }.upcoming-row>div { min-width: 65%; }.upcoming-row>.button { margin-left: 0; }.upcoming-meetings .section-heading h2 { font-size: 17px; }.upcoming-meetings .section-heading { align-items: flex-start; }.upcoming-meetings .section-heading p { max-width: 190px; } }
+
+/* ==========================================================================
+   Visual polish pass
+   Layered refinements for depth, interaction states and consistency.
+   ========================================================================== */
+
+:root {
+  --brand: #2563eb;
+  --brand-strong: #1d4ed8;
+  --brand-soft: #eff6ff;
+  --ink: #0f172a;
+  --ink-soft: #334155;
+  --muted: #64748b;
+  --faint: #94a3b8;
+  --line: #e2e8f0;
+  --line-soft: #f1f5f9;
+  --surface: #ffffff;
+  --canvas: #f8fafc;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, .06);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 20px -12px rgba(15, 23, 42, .22);
+  --shadow-md: 0 2px 6px rgba(15, 23, 42, .05), 0 20px 45px -24px rgba(15, 23, 42, .3);
+  --shadow-lg: 0 10px 30px -12px rgba(15, 23, 42, .22), 0 45px 90px -55px rgba(15, 23, 42, .45);
+  --ring: 0 0 0 3px rgba(37, 99, 235, .16);
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+::selection { background: rgba(37, 99, 235, .16); color: var(--ink); }
+
+html { scroll-padding-top: 130px; }
+.hero-join { scroll-margin-top: 0; }
+
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+* { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #cbd5e1; border: 3px solid transparent; border-radius: 999px; background-clip: content-box; }
+*::-webkit-scrollbar-thumb:hover { background: #94a3b8; background-clip: content-box; }
+
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  box-shadow: var(--ring);
+}
+
