@@ -2564,3 +2564,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .footer { background: linear-gradient(180deg, #ffffff, #fbfcfe); }
 .footer a:hover { color: var(--brand); }
 
+/* Auth pages. */
+.login-story {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(37, 99, 235, .38), transparent 47%),
+    radial-gradient(circle at 8% 92%, rgba(56, 189, 248, .2), transparent 52%),
+    #0b1120;
+}
+.login-art {
+  box-shadow: 0 30px 60px -30px rgba(37, 99, 235, .65);
+  border-color: #3b5680;
+}
+.orbit { border-color: rgba(59, 86, 128, .7); }
+.google-button { box-shadow: var(--shadow-sm); }
+.google-button:hover { box-shadow: var(--shadow-md); border-color: #b6c2d2; }
+
