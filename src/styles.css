@@ -2705,3 +2705,45 @@ input:focus, textarea:focus, select:focus {
   .sidebar-bottom { padding: 15px 13px; }
 }
 
+/* ==========================================================================
+   Professional refinement
+   A restrained, internationally familiar product finish: crisp hierarchy,
+   calm surfaces, readable metadata and consistent component treatment.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+  --font-sans: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+    "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --hairline: rgba(15, 23, 42, .08);
+  --hairline-soft: rgba(15, 23, 42, .05);
+  --elev-1: 0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .06);
+  --elev-2: 0 2px 4px rgba(15, 23, 42, .04), 0 12px 28px -18px rgba(15, 23, 42, .28);
+  --elev-3: 0 4px 10px rgba(15, 23, 42, .05), 0 28px 60px -32px rgba(15, 23, 42, .35);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.004em;
+  color: var(--ink);
+}
+
+button, input, textarea, select { font-family: var(--font-sans); }
+
+h1, h2, h3 { font-weight: 680; letter-spacing: -0.028em; }
+h1 { letter-spacing: -0.032em; }
+.login-story h1,
+.waiting-state h2 { color: #fff; }
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  font-weight: 650;
+  color: #5b6b82;
+}
+
+.logo>span:last-child { font-weight: 700; letter-spacing: -0.7px; }
+.logo small { letter-spacing: 1.8px; }
+
