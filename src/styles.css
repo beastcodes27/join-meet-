@@ -2634,3 +2634,74 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .profile-menu[open] > div { animation: menu-in .16s var(--ease) both; }
 @keyframes menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
+/* Inputs. */
+input, textarea, select { transition: border-color .18s var(--ease), box-shadow .18s var(--ease); }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .1);
+}
+.join-input { box-shadow: var(--shadow-xs); transition: border-color .18s var(--ease), box-shadow .18s var(--ease); }
+.join-input:focus-within { border-color: #93c5fd; box-shadow: var(--ring); }
+
+/* Prejoin and exit states. */
+.prejoin-page {
+  background: radial-gradient(ellipse at 50% -10%, #eef4ff, transparent 55%), var(--canvas);
+}
+.prejoin-card { box-shadow: var(--shadow-md); }
+.prejoin-preview { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04), var(--shadow-sm); }
+.meeting-exit {
+  background: radial-gradient(circle at 50% 0%, #eff6ff, transparent 55%), var(--canvas);
+}
+.meeting-exit .button { margin-top: 4px; }
+
+/* In-room surfaces. */
+.room-header {
+  background: linear-gradient(180deg, #0d1526, #0b1120);
+  box-shadow: 0 1px 0 #1e293b;
+}
+.video-stage {
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, .09), transparent 62%);
+}
+.video-grid .lk-participant-tile { box-shadow: 0 10px 28px -18px rgba(0, 0, 0, .8); }
+.room-panel { box-shadow: -24px 0 60px -38px rgba(0, 0, 0, .55); }
+.room-button.selected { box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .28); }
+.room-toolbar {
+  background: linear-gradient(180deg, #0e1729, #0b1120);
+  box-shadow: 0 -10px 30px -22px rgba(0, 0, 0, .9);
+}
+.leave-button {
+  background: linear-gradient(145deg, #e25858, #cf3c3c);
+  box-shadow: 0 10px 22px -12px rgba(220, 38, 38, .8);
+  transition: background .18s var(--ease), box-shadow .18s var(--ease), transform .18s var(--ease);
+}
+.leave-button:hover { background: linear-gradient(145deg, #dc4a4a, #b91c1c); }
+.leave-button:active { transform: scale(.97); }
+.chat-message .chat-copy:hover { background: var(--brand-soft); color: var(--brand); }
+
+/* Overlays and notices. */
+.toast {
+  border: 1px solid rgba(255, 255, 255, .08);
+  box-shadow: 0 18px 45px -18px rgba(2, 6, 23, .6);
+}
+.modal { box-shadow: var(--shadow-lg); }
+.modal[open] { animation: modal-in .22s var(--ease) both; }
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.notification-entry { transition: background .2s var(--ease), border-color .2s var(--ease); }
+.notification-entry:hover { border-color: #cbd5e1; background: #f8fafc; }
+.notification-entry.unread:hover { background: #e8f1ff; }
+.booking-card { box-shadow: var(--shadow-md); }
+.schedule-empty { transition: border-color .25s var(--ease); }
+.schedule-empty:hover { border-color: #94a3b8; }
+
+.legal p { line-height: 1.9; }
+
+@media (max-width: 540px) {
+  html { scroll-padding-top: 105px; }
+  .nav { background: rgba(255, 255, 255, .9); }
+  .cta { padding-inline: 24px; margin-bottom: 45px; }
+  .sidebar-bottom { padding: 15px 13px; }
+}
+
